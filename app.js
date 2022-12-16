@@ -3,11 +3,13 @@ const bodyParser = require("body-parser");
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
-
-var items = ["Buy food"];
+app.use(express.static("public"));
 
 //tell app to use ejs
 app.set("view engine", "ejs");
+
+//declare global variables
+var items = ["Buy food"];
 
 app.get("/", function (req, res) {
   var today = new Date();
