@@ -9,10 +9,12 @@ app.use(express.static("public"));
 app.set("view engine", "ejs");
 
 //declare global variables
-var items = ["Buy food"];
+let items = ["Buy food"];
+let workItems = [];
 
+//the application “listens” for requests that match the specified route(s) and method(s), and when it detects a match, it calls the specified callback function.
 app.get("/", function (req, res) {
-  var today = new Date();
+  let today = new Date();
 
   const options = {
     weekday: "long",
@@ -21,21 +23,34 @@ app.get("/", function (req, res) {
     day: "numeric",
   };
 
-  var day = today.toLocaleDateString("en-us", options);
-
+  let day = today.toLocaleDateString("en-us", options);
   //uses the view engine set up above to render a particular page by looking at the list file that must be inside a views folder
   //the second parameter is a javascript object that has a key value pair;
   //I'm going to pass a variable into the file especified, with a value equal to whatever I have set that value to
   //every time I use "render", I have to provide both variables
-  res.render("list", { kindOfDay: day, newListItems: items });
+  res.render("list", { listTitle: day, newListItems: items });
 });
 
 //catch the post request by the form, gather the data and redirect
 app.post("/", function (req, res) {
-  var item = req.body.newItem;
-  items.push(item);
+  let item = req.body.newItem;
+  console.log(req.body);
 
-  res.redirect("/");
+  if (req.body.list === "Work") {
+    workItems.push(item);
+    res.redirect("/work");
+  } else {
+    items.push(item);
+    res.redirect("/");
+  }
+});
+
+app.get("/work", function (req, res) {
+  res.render("list", { listTitle: "Work List", newListItems: workItems });
+});
+
+app.get("/about", function (req, res) {
+  res.render("about", {});
 });
 
 app.listen(3000, function () {
