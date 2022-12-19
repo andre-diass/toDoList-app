@@ -1,5 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+//the date object is bound to the exports of the date module
+const date = require(__dirname + "\\date.js");
 
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -14,16 +16,11 @@ let workItems = [];
 
 //the application “listens” for requests that match the specified route(s) and method(s), and when it detects a match, it calls the specified callback function.
 app.get("/", function (req, res) {
-  let today = new Date();
-
-  const options = {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  };
-
-  let day = today.toLocaleDateString("en-us", options);
+    
+    
+    //call the function the is bound to the const date and activate the getDate funcion
+    let day = date.getDate()
+    
   //uses the view engine set up above to render a particular page by looking at the list file that must be inside a views folder
   //the second parameter is a javascript object that has a key value pair;
   //I'm going to pass a variable into the file especified, with a value equal to whatever I have set that value to
