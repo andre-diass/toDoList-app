@@ -1,23 +1,26 @@
+
+///////////////////////////////////////initialize app////////////////////////////////////////////////////////
+//require npm packages
 const express = require("express");
+const app = express();
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-//the date object is bound to the exports of the date module
-const date = require(__dirname + "\\date.js");
+const date = require(__dirname + "\\date.js"); //the date object is bound to the exports of the date module
 
-const app = express();
+//tell app to use ejs and bodyparser
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
-
-//tell app to use ejs
-app.set("view engine", "ejs");
+app.set("view engine", "ejs"); 
 
 //declare global variables
-let items = ["Buy food"];
 let workItems = [];
 
-mongoose.connect('mongodb://127.0.0.1:27017/todolistDB');
+//connect to mongoDB
+mongoose.connect('mongodb://127.0.0.1:27017/todolistDB'); 
 mongoose.set("strictQuery", true);
 
+
+/////////////////////////////////////////create moongose schema, colection and default itemslist//////////////////////////////
 //create mongoose schema
 const itemSchema = new mongoose.Schema({
   name: String
@@ -46,15 +49,28 @@ Item.insertMany(defaultItems , function(err) {
   
 });
 
+
+
+///////////////////////////////////////////////////handle form and render page////////////////////////////////////////////////
+
 //the application “listens” for requests that match the specified route(s) and method(s), and when it detects a match, it calls the specified callback function.
 app.get("/", function (req, res) {
-    
-    
-  //uses the view engine set up above to render a particular page by looking at the list file that must be inside a views folder
-  //the second parameter is a javascript object that has a key value pair;
-  //I'm going to pass a variable into the file especified, with a value equal to whatever I have set that value to
-  //every time I use "render", I have to provide both variables
-  res.render("list", { listTitle: "Today", newListItems: items });
+  
+  Item.find(function (err, items) {
+      if(items.length === 0) {
+        res.redirect("/") 
+        Item.insertMany(defaultItems , function(err) {
+          if(err) {
+            console.log(err);
+          } else{
+            console.log("Succsessfully added default items to DB");
+          }
+        });
+           
+      } else {res.render("list", { listTitle: "Today", newListItems: items });}
+        
+  });  
+  
 });
 
 //catch the post request by the form, gather the data and redirect
