@@ -1,5 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const mongoose = require("mongoose");
 //the date object is bound to the exports of the date module
 const date = require(__dirname + "\\date.js");
 
@@ -14,18 +15,46 @@ app.set("view engine", "ejs");
 let items = ["Buy food"];
 let workItems = [];
 
+mongoose.connect('mongodb://127.0.0.1:27017/todolistDB');
+mongoose.set("strictQuery", true);
+
+//create mongoose schema
+const itemSchema = new mongoose.Schema({
+  name: String
+});
+
+//create Item colection
+const Item = mongoose.model("Item" , itemSchema);
+
+//create data document
+const item1 = new Item({
+  name: "workout"
+});
+
+const item2 = new Item({
+  name: "study"
+});
+
+const defaultItems = [item1, item2];
+
+Item.insertMany(defaultItems , function(err) {
+  if(err) {
+    console.log(err);
+  } else{
+    console.log("Succsessfully added default items to DB");
+  }
+  
+});
+
 //the application “listens” for requests that match the specified route(s) and method(s), and when it detects a match, it calls the specified callback function.
 app.get("/", function (req, res) {
     
-    
-    //call the function the is bound to the const date and activate the getDate funcion
-    let day = date.getDate()
     
   //uses the view engine set up above to render a particular page by looking at the list file that must be inside a views folder
   //the second parameter is a javascript object that has a key value pair;
   //I'm going to pass a variable into the file especified, with a value equal to whatever I have set that value to
   //every time I use "render", I have to provide both variables
-  res.render("list", { listTitle: day, newListItems: items });
+  res.render("list", { listTitle: "Today", newListItems: items });
 });
 
 //catch the post request by the form, gather the data and redirect
