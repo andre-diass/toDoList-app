@@ -1,5 +1,5 @@
 
-///////////////////////////////////////initialize app////////////////////////////////////////////////////////
+////////////////////////////////////////////////////initialize app////////////////////////////////////////////////////////
 //require npm packages
 const express = require("express");
 const app = express();
@@ -12,22 +12,26 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.set("view engine", "ejs"); 
 
-//declare global variables
-let workItems = [];
-
 //connect to mongoDB
 mongoose.connect('mongodb://127.0.0.1:27017/todolistDB'); 
 mongoose.set("strictQuery", true);
 
 
-/////////////////////////////////////////create moongose schema, colection and default itemslist//////////////////////////////
+/////////////////////////////////////////create moongose schema, colection and default itemslist///////////////////////////
 //create mongoose schema
 const itemSchema = new mongoose.Schema({
   name: String
 });
 
-//create Item colection
+const listSchema = new mongoose.Schema({
+  name: String, 
+  items: [itemSchema] //an array of items documents associated with it
+});
+
+
+//create model
 const Item = mongoose.model("Item" , itemSchema);
+const List = mongoose.model("List", listSchema);
 
 //create data document
 const item1 = new Item({
@@ -48,7 +52,6 @@ Item.insertMany(defaultItems , function(err) {
   }
   
 });
-
 
 
 ///////////////////////////////////////////////////handle form and render page////////////////////////////////////////////////
@@ -73,10 +76,49 @@ app.get("/", function (req, res) {
   
 });
 
+app.get("/:customListName" , function(req, res) {
+  const customListName = req.params.customListName;
+  
+  const list = new List({
+    name: customListName,
+    items: defaultItems
+  });
+  
+  list.save();
+});
+
+
 //catch the post request by the form, gather the data and redirect
 app.post("/", function (req, res) {
-  let item = req.body.newItem;
-  console.log(req.body);
+  let itemName = req.body.newItem;
+  const item = new Item ({
+    name: itemName
+  });
+  
+  
+  item.save();
+  res.redirect("/");  //re enter the the home rout by the get method and render the page
+});
+
+
+app.post("/delete" , function (req, res) {
+  const checkedItemId = req.body.checkbox;
+  Item.findByIdAndRemove(checkedItemId , function(err) {
+    if(!err){
+      console.log("sucssefully deleted item");
+      res.redirect("/")
+    }
+    
+  });
+  
+});
+
+app.listen(3000, function () {
+  console.log("server started on port 3000");
+});
+
+
+/* console.log(req.body);
 
   if (req.body.list === "Work") {
     workItems.push(item);
@@ -85,16 +127,13 @@ app.post("/", function (req, res) {
     items.push(item);
     res.redirect("/");
   }
-});
+} */
 
-app.get("/work", function (req, res) {
+
+/* app.get("/work", function (req, res) {
   res.render("list", { listTitle: "Work List", newListItems: workItems });
 });
 
 app.get("/about", function (req, res) {
   res.render("about", {});
-});
-
-app.listen(3000, function () {
-  console.log("server started on port 3000");
-});
+}); */
