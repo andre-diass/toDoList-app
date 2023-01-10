@@ -6,6 +6,7 @@ const app = express();
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const date = require(__dirname + "\\date.js"); //the date object is bound to the exports of the date module
+const lodash = require("lodash")
 
 //tell app to use ejs and bodyparser
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -14,7 +15,7 @@ app.set("view engine", "ejs");
 
 //connect to mongoDB
 mongoose.set("strictQuery", true);
-mongoose.connect('mongodb://127.0.0.1:27017/todolistDB'); 
+mongoose.connect('mongodb+srv://admin:<Teste123>@cluster0.h5o6m6a.mongodb.net/todolistDB'); 
 
 
 
@@ -78,7 +79,7 @@ app.get("/", function (req, res) {
 });
 
 app.get("/:customListName" , function(req, res) {
-  const customListName = req.params.customListName;
+  const customListName = lodash.capitalize(req.params.customListName);
   
   List.findOne({name:customListName} , (err, result) => {
     if (!err){
@@ -102,28 +103,50 @@ app.get("/:customListName" , function(req, res) {
 
 //catch the post request by the form, gather the data and redirect
 app.post("/", function (req, res) {
-  let itemName = req.body.newItem;
+  const itemName = req.body.newItem;
+  const listName = req.body.list;
+  
   const item = new Item ({
     name: itemName
   });
   
+  if (listName === "Today"){
+    item.save();
+    res.redirect("/");  //re enter the the home rout by the get method and render the page
+  } else{
+    List.findOne({name:listName} , (err, result) => {
+      result.items.push(item);
+      result.save();
+      res.redirect("/" + listName);
+      
+    });
+  }
   
-  item.save();
-  res.redirect("/");  //re enter the the home rout by the get method and render the page
 });
 
 
-app.post("/delete" , function (req, res) {
+ app.post("/delete" , function (req, res) {
   const checkedItemId = req.body.checkbox;
-  Item.findByIdAndRemove(checkedItemId , function(err) {
-    if(!err){
-      console.log("sucssefully deleted item");
-      res.redirect("/")
-    }
-    
-  });
+  const listName= req.body.listName;
   
-});
+  if (listName === "Today") {
+    Item.findByIdAndRemove(checkedItemId , function(err) {
+      if(!err){
+        console.log("sucssefully deleted item");
+        res.redirect("/")
+      }
+    });
+  }else{
+    List.findOneAndUpdate({name:listName}, {$pull:{items: {_id:checkedItemId}}} , (err, result) => {
+      if(!err) {
+        res.redirect("/" + listName);
+      }
+    });
+    
+    
+  }
+  
+}); 
 
 app.listen(3000, function () {
   console.log("server started on port 3000");

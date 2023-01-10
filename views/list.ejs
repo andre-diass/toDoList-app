@@ -2,7 +2,7 @@
 
 
         <div class="box" id="heading">
-            <h1> <%= listTitle %> </h1>
+            <h1> <%=listTitle%> </h1>
         </div>
         
         <div class="box">
@@ -12,14 +12,15 @@
                     <div class="item">
                         <input type="checkbox" name= "checkbox" value="<%=item._id%>" onChange= "this.form.submit()">   <!-- since this element doesn't have a submit type, I add the onChange wich will take the current form that this input is inside and it's goint to submit it to make the post request to delete route every time the input changes. In additon I have to add a name to get access to the input-->
                         <p> <%= item.name %> </p>       
-                    </div>       
+                    </div>      
+                    <input type="hidden" name="listName" value="<%=listTitle%> "></input> 
                 <% })  %>
             </form>
                 
                 
                 <form class="item" action="/" method="post">
                     <input type="text" name="newItem" placeholder="Add new item" />
-                    <button type="submit" name="list" value= <%= listTitle %> >+</button>
+                    <button type="submit" name="list" value= <%=listTitle%> >+</button>
                 </form>
         </div>    
   
