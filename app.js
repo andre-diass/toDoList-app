@@ -13,12 +13,13 @@ app.use(express.static("public"));
 app.set("view engine", "ejs"); 
 
 //connect to mongoDB
-mongoose.connect('mongodb://127.0.0.1:27017/todolistDB'); 
 mongoose.set("strictQuery", true);
+mongoose.connect('mongodb://127.0.0.1:27017/todolistDB'); 
+
 
 
 /////////////////////////////////////////create moongose schema, colection and default itemslist///////////////////////////
-//create mongoose schema
+//create mongoose schemas
 const itemSchema = new mongoose.Schema({
   name: String
 });
@@ -29,7 +30,7 @@ const listSchema = new mongoose.Schema({
 });
 
 
-//create model
+//create models
 const Item = mongoose.model("Item" , itemSchema);
 const List = mongoose.model("List", listSchema);
 
@@ -79,12 +80,23 @@ app.get("/", function (req, res) {
 app.get("/:customListName" , function(req, res) {
   const customListName = req.params.customListName;
   
-  const list = new List({
-    name: customListName,
-    items: defaultItems
+  List.findOne({name:customListName} , (err, result) => {
+    if (!err){
+      if(!result){
+        //create new list
+        const list = new List({
+          name: customListName,
+          items: defaultItems});
+          list.save();
+          res.redirect("/" + customListName);
+      }
+      else{
+        //show an existing list
+        res.render("list" , {listTitle: result.name, newListItems: result.items})
+      }};
   });
   
-  list.save();
+  
 });
 
 
@@ -118,22 +130,3 @@ app.listen(3000, function () {
 });
 
 
-/* console.log(req.body);
-
-  if (req.body.list === "Work") {
-    workItems.push(item);
-    res.redirect("/work");
-  } else {
-    items.push(item);
-    res.redirect("/");
-  }
-} */
-
-
-/* app.get("/work", function (req, res) {
-  res.render("list", { listTitle: "Work List", newListItems: workItems });
-});
-
-app.get("/about", function (req, res) {
-  res.render("about", {});
-}); */
