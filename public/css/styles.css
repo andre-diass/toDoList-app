@@ -1,6 +1,6 @@
 html {
   background-color: #e4e9fd;
-  background-image: -webkit-linear-gradient(65deg, #a683e3 50%, #e4e9fd 50%);
+  background-image: -webkit-linear-gradient(65deg, #FEA1BF 50%, #e4e9fd 50%);
   min-height: 1000px;
   font-family: "helvetica neue";
 }
@@ -19,7 +19,7 @@ h1 {
 }
 
 #heading {
-  background-color: #a683e3;
+  background-color: #FEA1BF;
   text-align: center;
 }
 
@@ -37,7 +37,7 @@ h1 {
 /* it`s goint to look for a input that is in checked state and target all the paragraphs elements that come after the checked input */
 input:checked + p {
   text-decoration: line-through;
-  text-decoration-color: #a683e3;
+  text-decoration-color: #FEA1BF;
 }
 
 /* target all the inputs that have an attribute type that is equal to checkbox */
@@ -63,7 +63,7 @@ button {
   width: 50px;
   border-radius: 50%;
   border-color: transparent;
-  background-color: #a683e3;
+  background-color: #FEA1BF;
   color: #fff;
   font-size: 30px;
   padding-bottom: 6px;
@@ -83,7 +83,7 @@ input[type="text"] {
 
 input[type="text"]:focus {
   outline: none;
-  box-shadow: inset 0 -3px 0 0 #a683e3;
+  box-shadow: inset 0 -3px 0 0 #FEA1BF;
 }
 
 /* this is a pseudo selector */

@@ -5,7 +5,6 @@ const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
-const date = require(__dirname + "\\date.js"); //the date object is bound to the exports of the date module
 const lodash = require("lodash")
 
 //tell app to use ejs and bodyparser
@@ -13,47 +12,46 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
 app.set("view engine", "ejs"); 
 
-//connect to mongoDB
-mongoose.set("strictQuery", true);
-mongoose.connect('mongodb+srv://admin:<Teste123>@cluster0.h5o6m6a.mongodb.net/todolistDB'); 
+//connect to mongoDB  
+mongoose.set('strictQuery', false);
+mongoose.connect("mongodb+srv://admin:Teste123@cluster0.h5o6m6a.mongodb.net/todolistDB");
 
 
 
 /////////////////////////////////////////create moongose schema, colection and default itemslist///////////////////////////
-//create mongoose schemas
-const itemSchema = new mongoose.Schema({
+
+const itemSchema = {
   name: String
+};
+
+const Item = mongoose.model("Item" , itemSchema);
+
+const item1 = new Item({
+  name: "Assistir Harry Potter Relíquias da Morte parte 2"
 });
+
+const item2 = new Item({
+  name: "Com Andrezinho o ser humano mais incrível do mundo"
+});
+
+const item3 = new Item({
+  name: "Acertar tudo no tutorial de esquizofrenia"
+});
+
+const item4 = new Item({
+  name: "Fazer o almoço do Ytalo"
+});
+
+const defaultItems = [item1, item2, item3, item4];
 
 const listSchema = new mongoose.Schema({
   name: String, 
   items: [itemSchema] //an array of items documents associated with it
 });
 
-
-//create models
-const Item = mongoose.model("Item" , itemSchema);
 const List = mongoose.model("List", listSchema);
 
-//create data document
-const item1 = new Item({
-  name: "workout"
-});
 
-const item2 = new Item({
-  name: "study"
-});
-
-const defaultItems = [item1, item2];
-
-Item.insertMany(defaultItems , function(err) {
-  if(err) {
-    console.log(err);
-  } else{
-    console.log("Succsessfully added default items to DB");
-  }
-  
-});
 
 
 ///////////////////////////////////////////////////handle form and render page////////////////////////////////////////////////
@@ -61,9 +59,9 @@ Item.insertMany(defaultItems , function(err) {
 //the application “listens” for requests that match the specified route(s) and method(s), and when it detects a match, it calls the specified callback function.
 app.get("/", function (req, res) {
   
-  Item.find(function (err, items) {
+  Item.find({}, function (err, items) {
       if(items.length === 0) {
-        res.redirect("/") 
+        
         Item.insertMany(defaultItems , function(err) {
           if(err) {
             console.log(err);
@@ -71,8 +69,8 @@ app.get("/", function (req, res) {
             console.log("Succsessfully added default items to DB");
           }
         });
-           
-      } else {res.render("list", { listTitle: "Today", newListItems: items });}
+        res.redirect("/")  
+      } else {res.render("list", { listTitle: "Hoje", newListItems: items });}
         
   });  
   
@@ -87,7 +85,8 @@ app.get("/:customListName" , function(req, res) {
         //create new list
         const list = new List({
           name: customListName,
-          items: defaultItems});
+          items: defaultItems
+        });
           list.save();
           res.redirect("/" + customListName);
       }
@@ -141,14 +140,12 @@ app.post("/", function (req, res) {
       if(!err) {
         res.redirect("/" + listName);
       }
-    });
-    
-    
+    }); 
   }
-  
 }); 
 
-app.listen(3000, function () {
+
+app.listen(process.env.PORT || 3000, function () {
   console.log("server started on port 3000");
 });
 
