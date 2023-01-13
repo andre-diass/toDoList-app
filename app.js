@@ -7,6 +7,18 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const lodash = require("lodash")
 
+app.use( function(req, res, next) { // Ignore favicon.ico requests.
+
+  if (req.originalUrl && req.originalUrl.split("/").pop() === 'favicon.ico') {
+
+     return res.sendStatus(204);
+
+  }
+
+  return next();
+
+});
+
 //tell app to use ejs and bodyparser
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static("public"));
@@ -144,15 +156,14 @@ app.post("/", function (req, res) {
   }
 }); 
 
+app.listen(process.env.PORT);
+
+
+
+
 let port = process.env.PORT;
-if (port = null || port == "" {
-  port = 3000;
-};
-
-
-
-app.listen(process.env.PORT || 3000, function () {
-  console.log("server started on port 3000");
-});
-
+if (port == null || port == "") {
+  port = 8000;
+}
+app.listen(port);
 
