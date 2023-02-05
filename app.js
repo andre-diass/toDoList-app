@@ -42,19 +42,16 @@ const item1 = new Item({
   name: "Assistir Harry Potter Relíquias da Morte parte 2"
 });
 
-const item2 = new Item({
-  name: "Com Andrezinho o ser humano mais incrível do mundo"
-});
 
-const item3 = new Item({
+const item2 = new Item({
   name: "Acertar tudo no tutorial de esquizofrenia"
 });
 
-const item4 = new Item({
+const item3 = new Item({
   name: "Fazer o almoço do Ytalo"
 });
 
-const defaultItems = [item1, item2, item3, item4];
+const defaultItems = [item1, item2, item3];  
 
 const listSchema = new mongoose.Schema({
   name: String, 
@@ -155,6 +152,7 @@ app.post("/", function (req, res) {
     }); 
   }
 }); 
+
 
 
 let port = process.env.PORT;
