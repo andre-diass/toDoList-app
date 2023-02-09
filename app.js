@@ -7,7 +7,7 @@ const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 const lodash = require("lodash")
 
-app.use( function(req, res, next) { // Ignore favicon.ico requests.
+/* app.use( function(req, res, next) { // Ignore favicon.ico requests.
 
   if (req.originalUrl && req.originalUrl.split("/").pop() === 'favicon.ico') {
 
@@ -17,7 +17,7 @@ app.use( function(req, res, next) { // Ignore favicon.ico requests.
 
   return next();
 
-});
+}); */
 
 //tell app to use ejs and bodyparser
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -48,7 +48,7 @@ const item2 = new Item({
 });
 
 const item3 = new Item({
-  name: "Fazer o almoço do Ytalo"
+  name: "Estudar"
 });
 
 const defaultItems = [item1, item2, item3];  
@@ -118,7 +118,7 @@ app.post("/", function (req, res) {
     name: itemName
   });
   
-  if (listName === "Today"){
+  if (listName === "Hoje"){
     item.save();
     res.redirect("/");  //re enter the the home rout by the get method and render the page
   } else{
@@ -137,7 +137,7 @@ app.post("/", function (req, res) {
   const checkedItemId = req.body.checkbox;
   const listName= req.body.listName;
   
-  if (listName === "Today") {
+  if (listName === "Hoje") {
     Item.findByIdAndRemove(checkedItemId , function(err) {
       if(!err){
         console.log("sucssefully deleted item");
